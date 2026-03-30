@@ -1,0 +1,10 @@
+src/**
+webview/*.ts
+scripts/**
+archive/**
+node_modules/**
+*.ts
+tsconfig*.json
+.gitignore
+Requirements.md
+Plan.md

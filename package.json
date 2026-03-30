@@ -1,0 +1,85 @@
+{
+  "name": "redai",
+  "displayName": "RedAI",
+  "description": "Toggle between WYSIWYG visual editing and raw Markdown source for .md files.",
+  "version": "0.0.2",
+  "publisher": "your-publisher-id",
+  "engines": { "vscode": "^1.74.0" },
+  "categories": ["Editors"],
+  "activationEvents": ["onCustomEditor:redai.editor"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "redai.showVisual",
+        "title": "Switch to Visual View",
+        "group": "navigation@1",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "redai.showSource",
+        "title": "Switch to Source View",
+        "group": "navigation@2",
+        "icon": "$(code)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "redai.showSource",
+          "group": "navigation",
+          "when": "activeCustomEditorId == 'redai.editor'"
+        },
+        {
+          "command": "redai.showVisual",
+          "group": "navigation",
+          "when": "activeCustomEditorId == 'redai.editor'"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "redai.editor",
+        "displayName": "RedAI",
+        "selector": [{ "filenamePattern": "*.md" }],
+        "priority": "option"
+      }
+    ],
+    "configuration": {
+      "title": "RedAI",
+      "properties": {
+        "redai.defaultView": {
+          "type": "string",
+          "enum": ["visual", "source"],
+          "default": "visual",
+          "description": "Which view is shown when a file is first opened."
+        },
+        "redai.syncDebounceMs": {
+          "type": "number",
+          "default": 300,
+          "description": "Debounce delay (ms) for source-editor-to-host sync."
+        },
+        "redai.makeDefaultEditor": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, registers as the default editor for .md files."
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/redai"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "watch": "node scripts/build.js --watch",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.3.0"
+  }
+}

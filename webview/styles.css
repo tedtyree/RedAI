@@ -1,0 +1,395 @@
+/* ── Reset & base ────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* body must never scroll — content containers handle their own scroll */
+  font-family: var(--vscode-font-family, sans-serif);
+  font-size: var(--vscode-font-size, 13px);
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+  line-height: 1.6;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+/* Fixed to the viewport — immune to any body-level scroll */
+#app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Formatting toolbar (visual mode only) ───────────────────────────────── */
+
+.toolbar {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px 8px;
+  background-color: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-editor-background));
+  border-bottom: 1px solid var(--vscode-editorGroup-border, transparent);
+}
+
+.toolbar-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 3px;
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  cursor: pointer;
+  font-size: 11px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.toolbar-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.toolbar-btn:hover:not(.active) {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.toolbar-type-label {
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  color: var(--vscode-descriptionForeground);
+  align-self: center;
+  min-width: 3em;
+}
+
+/* ── Unsupported content warning banner ──────────────────────────────────── */
+
+.warning-banner {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  background-color: var(--vscode-inputValidation-warningBackground, rgba(200,150,0,0.15));
+  border-bottom: 1px solid var(--vscode-inputValidation-warningBorder, rgba(200,150,0,0.5));
+  color: var(--vscode-inputValidation-warningForeground, var(--vscode-foreground, currentColor));
+}
+
+/* ── Source editor ───────────────────────────────────────────────────────── */
+
+.source-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.source-editor {
+  min-height: 100%;
+  padding: 16px;
+  outline: none;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: var(--vscode-editor-font-size, 14px);
+  line-height: 1.6;
+  white-space: pre-wrap;      /* preserves newlines and indentation */
+  overflow-wrap: break-word;  /* prevents horizontal overflow on long lines */
+}
+
+/* ── Visual editor container ─────────────────────────────────────────────── */
+
+.visual-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Semantic element resets (prevent UA stylesheet from overriding .block-*) */
+
+.visual-container h1, .visual-container h2, .visual-container h3,
+.visual-container h4, .visual-container h5, .visual-container h6,
+.visual-container p, .visual-container blockquote, .visual-container pre {
+  margin: 0;
+  padding: 0;
+}
+
+/* code inside pre inherits monospace from .block-code; needs no extra border */
+.visual-container pre > code {
+  display: block;
+  outline: none;
+}
+
+/* ── Block base styles ───────────────────────────────────────────────────── */
+
+.block {
+  margin: 0 0 4px 0;
+  padding: 2px 4px;
+  outline: none;
+  min-height: 1.4em;
+  border-radius: 2px;
+}
+
+.block:focus {
+  background-color: var(--vscode-editor-selectionBackground, rgba(100,100,255,0.1));
+}
+
+/* ── Paragraph ───────────────────────────────────────────────────────────── */
+
+/* Use .visual-container .block-p (specificity 20) to beat the element reset
+   rule .visual-container p (specificity 11) on line ~119. */
+.visual-container .block-p {
+  margin-top: 0.9em;  /* paragraph separation mirroring rendered Markdown */
+}
+
+/* ── Heading styles ──────────────────────────────────────────────────────── */
+
+.block-h1 { font-size: 2em;   font-weight: bold; margin-top: 0.5em; }
+.block-h2 { font-size: 1.5em; font-weight: bold; margin-top: 0.5em; }
+.block-h3 { font-size: 1.25em;font-weight: bold; margin-top: 0.4em; }
+.block-h4 { font-size: 1.1em; font-weight: bold; }
+.block-h5 { font-size: 1em;   font-weight: bold; }
+.block-h6 { font-size: 0.9em; font-weight: bold; color: var(--vscode-descriptionForeground); }
+
+/* ── Blockquote ──────────────────────────────────────────────────────────── */
+
+/* Use .visual-container .block-blockquote (specificity 20) to beat the element
+   reset rule .visual-container blockquote (specificity 11) on line ~119. */
+.visual-container .block-blockquote {
+  border-left: 3px solid var(--vscode-textBlockQuote-border, #888);
+  padding-left: 16px;
+  margin-top: 0.75em;
+  color: var(--vscode-descriptionForeground, var(--vscode-foreground, inherit));
+  background-color: var(--vscode-textBlockQuote-background, transparent);
+  font-style: italic;
+}
+
+/* ── Code block ──────────────────────────────────────────────────────────── */
+
+.block-code {
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: var(--vscode-textCodeBlock-background, rgba(128,128,128,0.1));
+  border-radius: 4px;
+  padding: 8px 12px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ── HR ──────────────────────────────────────────────────────────────────── */
+
+.block-hr {
+  border: none;
+  border-top: 2px solid var(--vscode-foreground, currentColor);
+  opacity: 0.35;
+  width: 75%;
+  margin: 20px auto 12px;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Unordered list items ────────────────────────────────────────────────── */
+
+.block-ul1, .block-ul2, .block-ul3, .block-ul4, .block-ul5,
+.block-ul6, .block-ul7 {
+  list-style: none;
+  position: relative;
+}
+
+.block-ul1::before { content: '•'; position: absolute; left: calc(0 * 24px + 8px); }
+.block-ul2::before { content: '◦'; position: absolute; left: calc(1 * 24px + 8px); }
+.block-ul3::before { content: '▪'; position: absolute; left: calc(2 * 24px + 8px); }
+.block-ul4::before { content: '•'; position: absolute; left: calc(3 * 24px + 8px); }
+.block-ul5::before { content: '◦'; position: absolute; left: calc(4 * 24px + 8px); }
+.block-ul6::before { content: '▪'; position: absolute; left: calc(5 * 24px + 8px); }
+.block-ul7::before { content: '•'; position: absolute; left: calc(6 * 24px + 8px); }
+
+.block-ul1 { padding-left: calc(1 * 24px); }
+.block-ul2 { padding-left: calc(2 * 24px); }
+.block-ul3 { padding-left: calc(3 * 24px); }
+.block-ul4 { padding-left: calc(4 * 24px); }
+.block-ul5 { padding-left: calc(5 * 24px); }
+.block-ul6 { padding-left: calc(6 * 24px); }
+.block-ul7 { padding-left: calc(7 * 24px); }
+
+/* ── Ordered list items ──────────────────────────────────────────────────── */
+
+.block-ol1 { padding-left: calc(1 * 24px); }
+.block-ol2 { padding-left: calc(2 * 24px); }
+.block-ol3 { padding-left: calc(3 * 24px); }
+.block-ol4 { padding-left: calc(4 * 24px); }
+.block-ol5 { padding-left: calc(5 * 24px); }
+.block-ol6 { padding-left: calc(6 * 24px); }
+.block-ol7 { padding-left: calc(7 * 24px); }
+
+/* ── Inline formatting ───────────────────────────────────────────────────── */
+
+.visual-container strong,
+.visual-container b      { font-weight: bold; }
+
+.visual-container em,
+.visual-container i      { font-style: italic; }
+
+.visual-container del,
+.visual-container s      { text-decoration: line-through; }
+
+.visual-container .inline-code {
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: var(--vscode-textCodeBlock-background, rgba(128,128,128,0.15));
+  border-radius: 3px;
+  padding: 0 3px;
+  font-size: 0.9em;
+}
+
+.visual-container .inline-link {
+  color: var(--vscode-textLink-foreground, #3794ff);
+  text-decoration: underline;
+  pointer-events: none;  /* clicks fall through to the contenteditable parent */
+  cursor: text;
+}
+
+/* ── Multi-block selection ───────────────────────────────────────────────── */
+
+.block-selected {
+  background-color: var(--vscode-editor-selectionBackground, rgba(100,100,255,0.15)) !important;
+  outline: 1px solid var(--vscode-focusBorder, rgba(100,100,255,0.4));
+  outline-offset: 1px;
+}
+
+.visual-container.multi-select-mode {
+  user-select: none;
+}
+
+/* ── Block drag handle ───────────────────────────────────────────────────── */
+
+.drag-handle {
+  position: fixed;
+  display: none;       /* shown via JS when a block has focus */
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  cursor: grab;
+  color: var(--vscode-descriptionForeground, #888);
+  opacity: 0.5;
+  z-index: 100;
+  transition: opacity 0.1s;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  background-color: var(--vscode-toolbar-hoverBackground, rgba(128,128,128,0.15));
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  opacity: 1;
+}
+
+/* ── Block drop position indicator ──────────────────────────────────────── */
+
+.drop-indicator {
+  position: fixed;
+  height: 2px;
+  background-color: var(--vscode-focusBorder, #4a9eff);
+  pointer-events: none;
+  z-index: 200;
+  border-radius: 1px;
+}
+
+/* ── Find bar ────────────────────────────────────────────────────────────── */
+
+.find-bar {
+  position: fixed;
+  top: 40px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  border: 1px solid var(--vscode-editorWidget-border, var(--vscode-editorGroup-border, rgba(128,128,128,0.4)));
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.find-input {
+  width: 180px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family, sans-serif);
+  background-color: var(--vscode-input-background, transparent);
+  color: var(--vscode-input-foreground, inherit);
+  border: 1px solid var(--vscode-input-border, rgba(128,128,128,0.4));
+  border-radius: 2px;
+  outline: none;
+}
+
+.find-input:focus {
+  border-color: var(--vscode-focusBorder, #4a9eff);
+}
+
+.find-counter {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  min-width: 64px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.find-btn {
+  padding: 2px 6px;
+  font-size: 12px;
+  background: transparent;
+  color: var(--vscode-foreground, inherit);
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.find-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground, rgba(128,128,128,0.15));
+  border-color: var(--vscode-button-border, transparent);
+}
+
+.find-close {
+  font-size: 14px;
+  padding: 1px 5px;
+}
+
+/* ── Find match highlights ───────────────────────────────────────────────── */
+
+.find-match {
+  background-color: var(--vscode-editor-findMatchHighlightBackground, rgba(255,200,0,0.35));
+  border-radius: 2px;
+}
+
+.find-match-active {
+  background-color: var(--vscode-editor-findMatchBackground, rgba(255,140,0,0.6));
+  outline: 1px solid var(--vscode-editor-findMatchBorder, rgba(255,140,0,0.9));
+  border-radius: 2px;
+}
+
+/* ── Shake animation (indent limit feedback) ─────────────────────────────── */
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-5px); }
+  40%  { transform: translateX(5px); }
+  60%  { transform: translateX(-5px); }
+  80%  { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.3s ease-in-out;
+}
